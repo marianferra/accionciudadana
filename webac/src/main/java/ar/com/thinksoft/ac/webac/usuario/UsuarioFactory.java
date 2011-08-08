@@ -2,6 +2,7 @@ package ar.com.thinksoft.ac.webac.usuario;
 
 import ar.com.thinksoft.ac.intac.IUsuario;
 import ar.com.thinksoft.ac.webac.HomePagePermiso;
+import ar.com.thinksoft.ac.webac.web.mapas.MapaCiudadPermiso;
 
 /**
  * 
@@ -18,12 +19,12 @@ public class UsuarioFactory {
 	}
 
 	public IUsuario construirOperador() {
-		IUsuario usuario = this.construirAministrativo();
+		IUsuario usuario = this.construirAdministrativo();
 		return usuario;
 	}
 
 	public IUsuario construirAdministrador() {
-		IUsuario usuario = this.construirAministrativo();
+		IUsuario usuario = this.construirAdministrativo();
 		return usuario;
 	}
 
@@ -33,8 +34,8 @@ public class UsuarioFactory {
 	 * Construye un administrativo que es un usuario comun con los permisos
 	 * propios de un administrativo
 	 */
-	private IUsuario construirAministrativo() {
-		IUsuario usuario = this.construirUsuarioComun();
+	private IUsuario construirAdministrativo() {
+		IUsuario usuario = this.construirUsuarioAdministrativo();
 		return usuario;
 	}
 
@@ -50,6 +51,18 @@ public class UsuarioFactory {
 		IUsuario usuario = this.crearUsuario();
 
 		usuario.addPermiso(new HomePagePermiso());
+
+		return usuario;
+	}
+	
+	/**
+	 * Construye un usuario administrativo con los permisos correspondientes
+	 */
+	private IUsuario construirUsuarioAdministrativo() {
+
+		IUsuario usuario = this.construirUsuarioComun();
+
+		usuario.addPermiso(new MapaCiudadPermiso());
 
 		return usuario;
 	}
