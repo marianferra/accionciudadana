@@ -5,16 +5,39 @@ html,body {
 	padding: 0;
 	border: 0;
 	height: 100%;
-	overflow: hidden;
+	overflow: auto;
 	font-family: "Calibri", "Tahoma", Arial, Helvetica, sans-serif;
 	font-size: 12px;
+	background-color: #f5f5f5;
+	
 }
 
-.thinksoft {
-	background-image: url(/webac/src/main/java/ar/com/thinksoft/ac/webac/web/images/thinksoft.jpg);
-	background-repeat: no-repeat;
-	background-position: left top;
+.accionCiudadana {
+	background: transparent url(/images/logoAccionCiudadana.jpg) 0 3px no-repeat;
+	height: 80px;
+	width: 114px;
 }
+
+.titleRow{
+	background-color: #214977;	
+}
+
+.loginAndLogout{
+	text-align: right;
+	padding-right: 10px;
+	font-size: 15px;
+	color: #ffffff;
+}
+
+
+/******************NOTIFICACIONES****************************/
+.error{
+	color: red;
+	border: medium none transparent;
+	background-color: #F5F5F5;
+	text-align: center;
+}
+
 
 /******************ACA EMPIEZA EL ESTILO DEL MENU*******************/
 .menu {
@@ -43,7 +66,7 @@ html,body {
 }
 
 .menu li a {
-	background: #333333 url("../images/seperator.gif") bottom right
+	background: #333333 url("/images/menu/seperator.gif") bottom right
 		no-repeat;
 	color: #cccccc;
 	display: block;
@@ -56,7 +79,7 @@ html,body {
 }
 
 .menu li a:hover,.menu ul li:hover a {
-	background: #2580a2 url("../images/hover.gif") bottom center no-repeat;
+	background: #2580a2 url("/images/menu/hover.gif") bottom center no-repeat;
 	color: #FFFFFF;
 	text-decoration: none;
 }
@@ -80,7 +103,7 @@ html,body {
 }
 
 .menu li li {
-	background: url('../images/sub_sep.gif') bottom left no-repeat;
+	background: url('/images/menu/sub_sep.gif') bottom left no-repeat;
 	display: block;
 	float: none;
 	margin: 0px;
@@ -103,7 +126,7 @@ html,body {
 }
 
 .menu li ul a:hover,.menu li ul li:hover a {
-	background: #2580a2 url('../images/hover_sub.gif') center left no-repeat;
+	background: #2580a2 url('/images/menu/hover_sub.gif') center left no-repeat;
 	border: 0px;
 	color: #ffffff;
 	text-decoration: none;
