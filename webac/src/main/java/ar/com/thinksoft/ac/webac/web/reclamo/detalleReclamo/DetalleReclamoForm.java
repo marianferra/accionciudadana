@@ -30,13 +30,19 @@ public class DetalleReclamoForm  extends Form<Reclamo>{
 		setMultiPart(true);
 		List<IReclamo> lista = ReclamoManager.getInstance().obtenerReclamosFiltradosConPredicates(new PredicatePorUUID().filtrar(idReclamo));
 		
-		if(lista.size()!= 1)
+		if(lista.size()!= 1){
+			//TODO: dialogo error
 			throw new Exception("error en la base de datos, por favor, comuniquese con el equipo de soporte tecnico");
-		
+		}
 		reclamo = lista.get(0);
 		CompoundPropertyModel<Reclamo> model = new CompoundPropertyModel<Reclamo>(reclamo);
 		setModel(model);
 		
+		if(reclamo.getReclamosAsociados().size() > 0){
+			add(new Label("cantidadAsociados", String.valueOf(reclamo.getReclamosAsociados().size())));
+		}else{
+			add(new Label("cantidadAsociados",""));
+		}
 		add(new Label("calleIncidente", this.createBind(model,"calleIncidente")));
 		add(new Label("alturaIncidente",this.createBind(model,"alturaIncidente")));
 		add(new Label("latitudIncidente",this.createBind(model,"latitudIncidente")));
@@ -51,16 +57,16 @@ public class DetalleReclamoForm  extends Form<Reclamo>{
 		add(new Label("tipoIncidente", this.createBind(model,"tipoIncidente")));
 		add(new Label("observaciones",this.createBind(model, "observaciones")));
 		
+		
 		try{
 			IImagen imagen = reclamo.getImagen();
 			img = new ImageFactory(imagen);
 			add(new Label("rutaImagen",imagen.getFileName()));
 		}catch(Exception e){
-			LogFwk.getInstance(DetalleReclamoForm.class).error("no existe imagen para este reclamo");
 			add(new Label("rutaImagen",""));
 		}
 		
-		add(new Button("volver") {
+		add(new Button("volver"){
 			@Override
 			public void onSubmit() {
 				try{
@@ -72,22 +78,25 @@ public class DetalleReclamoForm  extends Form<Reclamo>{
 			}
 		});
 		
-		add(new Button("modificar") {
-			@Override
-			public void onSubmit() {
-				try{
-					img.deleteImage();
-				}catch(Exception e){
-					LogFwk.getInstance(DetalleReclamoPage.class).error("No existe archivo para borrar.");
-				}
-				
-				PageParameters params =new PageParameters();
-		        params.add("reclamoId", reclamo.getId());
-	            
-		        setResponsePage(ModificarReclamoPage.class, params);
-		        setRedirect(true);
-			}
-		});
+		Button modificar = new Button("modificar") {
+								@Override
+								public void onSubmit() {
+									try{
+										img.deleteImage();
+									}catch(Exception e){
+										LogFwk.getInstance(DetalleReclamoPage.class).error("No existe archivo para borrar.");
+									}
+									
+									PageParameters params =new PageParameters();
+							        params.add("reclamoId", reclamo.getId());
+						            
+							        setResponsePage(ModificarReclamoPage.class, params);
+							        setRedirect(true);
+								}
+							};
+							
+		modificar.setVisible(reclamo.isNotDown());
+		add(modificar);
 		
 	}
 	

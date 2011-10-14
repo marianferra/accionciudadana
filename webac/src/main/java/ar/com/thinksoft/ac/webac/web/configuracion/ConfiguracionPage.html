@@ -1,0 +1,191 @@
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+
+<head>
+<title>Configuracion</title>
+</head>
+
+<body>
+	<wicket:extend>
+		<div class="config">
+			<div align="center">
+				<h1>Configuraci&oacute;n</h1>
+			</div>
+			<form wicket:id="configuracionForm">
+				<table align="center">
+					<tr>
+						<td>
+							<h2 align="right">Proceso autom&aacute;tico de unificaci&oacute;n:</h2>
+						</td>
+					</tr>
+					<tr>
+						<td class="texto">
+							<label>Hora - Minuto - AM/PM</label><br>
+							<label style="font-style:italic;">(se debe reiniciar el servidor)</label>
+						</td>
+						<td class="block">
+							<input type="text" wicket:id="horaUnificador" id="horaUnificador" class="horaUnificador" size="2" maxlength="2" onchange="validarNumerosInput(this)"/> - 
+							<input type="text" wicket:id="minutoUnificador" id="minutoUnificador" class="minutoUnificador" size="2" maxlength="2" onchange="validarNumerosInput(this)"/> - 
+							<input type="text" wicket:id="manianaOTardeUnificador" id="manianaOTardeUnificador" class="manianaOTardeUnificador" size="2" maxlength="2" onchange="funcionOnChangeCampoIsNull(this)"/>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<h2 align="right">Configuraci&oacute;n del env&iacute;o de mail:</h2>
+						</td>
+					</tr>					
+					<tr>
+						<td class="texto">
+					 		<label>Smtp:</label>
+					 	</td>
+						<td class="block">
+					 		<input type="text" wicket:id="smtp" id="smtp" class="smtp" onchange="funcionOnChangeCampoIsNull(this)" style="width:200px;"/>
+					 	</td>
+					</tr>
+					<tr>
+						<td class="texto">
+					 		<label>Puerto:</label>
+					 	</td>
+						<td class="block">
+					 		<input type="text" wicket:id="puerto" id="puerto" class="puerto" onchange="validarNumerosInput(this)" style="width:200px;"/>
+					 	</td>
+					</tr>
+					<tr>
+						<td class="texto">
+					 		<label>Desde:</label>
+					 	</td>
+						<td class="block">
+					 		<input type="text" wicket:id="desdeMail" id="desdeMail" class="desdeMail" onchange="validarEmail(this)" style="width:200px;"/>
+					 	</td>
+					</tr>
+					<tr>
+						<td class="texto">
+					 		<label>TLS:</label>
+					 	</td>
+						<td class="block">
+					 		<input type="checkbox" wicket:id="TLS" id="TLS"/>
+					 	</td>
+					</tr>
+					<tr>
+						<td class="texto">
+					 		<label>Necesito credenciales:</label>
+					 	</td>
+						<td class="block">
+					 		<input type="checkbox" wicket:id="auth" id="auth" class="auth"/>
+					 	</td>
+					</tr>
+					<tr>
+						<td class="texto credenciales">
+					 		<label>Usuario:</label>
+					 	</td>
+						<td class="block">
+					 		<input type="text" wicket:id="user" id="user" class="user credenciales" onchange="funcionOnChangeCampoIsNull(this)" style="width:200px;"/>
+					 	</td>
+					</tr>
+					<tr>
+						<td class="texto credenciales">
+					 		<label>Password:</label>
+					 	</td>
+						<td class="block">
+					 		<input type="password" wicket:id="password" id="password" class="password credenciales" onchange="funcionOnChangeCampoIsNull(this)" style="width:200px;"/>
+					 	</td>
+					</tr>
+					<tr>
+						<td>
+							<h2 align="right">Base de datos:</h2>
+						</td>
+					</tr>
+					<tr>
+						<td class="texto">
+					 		<label>IP:</label>
+					 	</td>
+						<td class="block">
+					 		<input type="text" wicket:id="ipBD" id="ipBD" class="ipBD" onchange="funcionOnChangeCampoIsNull(this)"/>
+					 	</td>
+					</tr>
+					<tr>
+						<td class="texto">
+					 		<label>Puerto:</label>
+					 	</td>
+						<td class="block">
+					 		<input type="text" wicket:id="portBD" id="portBD" class="portBD" onchange="funcionOnChangeCampoIsNull(this)"/>
+					 	</td>
+					</tr>
+					<tr>
+						<td>
+							<h2 align="right">Rutas de archivos:</h2>
+						</td>
+					</tr>
+					<tr>
+						<td class="texto">
+					 		<label>Ruta de imagenes temporales:</label>
+					 	</td>
+						<td class="block">
+					 		<input type="text" wicket:id="pathTempImages" id="pathTempImages" class="inputText pathTempImages" onchange="funcionOnChangeCampoIsNull(this)"/>
+					 	</td>
+					</tr>
+					<tr>
+						<td class="texto">
+					 		<label>Ruta del archivo estilo exportaci&oacute;n:</label>
+					 	</td>
+						<td class="block">
+					 		<input type="text" wicket:id="pathExportDesign" id="pathExportDesign" class="inputText pathExportDesign" onchange="funcionOnChangeCampoIsNull(this)"/>
+					 	</td>
+					</tr>
+						<tr>
+							<td class="texto">
+						 		<label>Ruta del archivo de configuraci&oacute;n:</label>
+						 	</td>
+							<td class="block">
+						 		<input type="text" wicket:id="pathConfig" id="pathConfig" class="inputText pathConfig" onchange="funcionOnChangeCampoIsNull(this)"/>
+						 	</td>
+						</tr>
+						
+						<tr>
+							<td class="texto">
+						 		<label>Ruta de la aplicaci&oacute;n Android:</label>
+						 	</td>
+							<td class="block">
+						 		<input type="text" wicket:id="pathDownloadApp" id="pathDownloadApp" class="inputText pathDownloadApp" onchange="funcionOnChangeCampoIsNull(this)"/>
+						 	</td>
+						</tr>
+						<tr>
+							<td>
+								<h2 align="right">Clave de Google Maps:</h2>
+							</td>
+						</tr>
+						<tr>
+							<td class="texto">
+						 		<label>Clave:</label>
+						 	</td>
+							<td class="block">
+						 		<textarea wicket:id="keyGoogleMap" id="keyGoogleMap" class="pathDownloadApp" rows="2" cols="45" style="resize:none;" onchange="funcionOnChangeCampoIsNull(this)"></textarea>
+						 	</td>
+						</tr>
+				</table>
+				
+				<table align="center">
+					<tr>
+						<td>
+							<div class="block">
+								<input type="text" class="error" border="none" size="50"/>
+							</div>
+						</td>
+					</tr>
+				</table>
+
+				<table align="center">
+					<tr>
+						<td>
+							<div>
+								<input type="submit" wicket:id="guardarConfig" value="Guardar" class="block guardarConfig" style="float: left; margin:20px;"/>
+								<input type="submit" wicket:id="cancelar" value="Cancelar" class="block" style="float: right; margin:20px;"/>
+							</div>
+						</td>
+					</tr>
+				</table>
+
+			</form>
+		</div>
+	</wicket:extend>
+</body>
+</html>

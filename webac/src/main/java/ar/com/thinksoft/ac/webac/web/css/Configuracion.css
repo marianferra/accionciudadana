@@ -1,0 +1,39 @@
+@CHARSET "UTF-8";
+
+form
+{
+   position: inherited;
+   padding:2px;
+   display: inline;
+}
+
+label
+{
+   padding:2px;
+   text-align:left;
+   vertical-align: middle;
+}
+
+.block{
+   margin:10px 2px; 
+   font-family: "Trebuchet MS", Geneva, Arial, Helvetica, sans-serif;
+   font-size: 12px;
+}
+
+tr{
+	margin: 10px;	
+}
+
+td.texto{
+	text-align: right;	
+}
+
+.inputText{
+	width: 370px;
+}
+
+.help{
+	width:20px;
+	height: 20px;
+	background: transparent url(/images/help.png) 0 3px no-repeat;
+}

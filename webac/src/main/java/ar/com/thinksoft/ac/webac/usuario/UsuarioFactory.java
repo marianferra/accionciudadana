@@ -1,9 +1,5 @@
 package ar.com.thinksoft.ac.webac.usuario;
 
-import ar.com.thinksoft.ac.intac.IUsuario;
-import ar.com.thinksoft.ac.webac.HomePagePermiso;
-import ar.com.thinksoft.ac.webac.web.mapas.MapaCiudadPermiso;
-
 /**
  * 
  * @author Wilson
@@ -11,59 +7,46 @@ import ar.com.thinksoft.ac.webac.web.mapas.MapaCiudadPermiso;
  *         Objeto encargado de crear un nuevo usuario con los permisos standards
  * 
  */
+
 public class UsuarioFactory {
 
-	public IUsuario construirCiudadano() {
-		IUsuario usuario = this.construirUsuarioComun();
+	public Usuario construirCiudadano() {
+		Usuario usuario = this.crearUsuario();
+		usuario.addRole("CIUDADANO");
 		return usuario;
 	}
 
-	public IUsuario construirOperador() {
-		IUsuario usuario = this.construirAdministrativo();
+
+	public Usuario construirOperador() {
+		Usuario usuario = this.crearUsuario();
+		usuario.addRole("OPERADOR");
 		return usuario;
 	}
 
-	public IUsuario construirAdministrador() {
-		IUsuario usuario = this.construirAdministrativo();
+	public Usuario construirAdministrador() {
+		Usuario usuario = this.crearUsuario();
+		usuario.addRole("ADMIN");
 		return usuario;
+	}
+	
+	public Usuario construidGodMode(){
+		Usuario usuario = this.crearUsuario();
+		usuario.setNombre("god");
+		usuario.setApellido("god");
+		usuario.setContrasenia("god");
+		usuario.setNombreUsuario("god");
+		usuario.addRole("ADMIN");
+		usuario.addRole("CIUDADANO");
+		usuario.addRole("OPERADOR");
+
+		return usuario;
+		
 	}
 
 	// ********************** METODOS PRIVADOS *********************
 
-	/**
-	 * Construye un administrativo que es un usuario comun con los permisos
-	 * propios de un administrativo
-	 */
-	private IUsuario construirAdministrativo() {
-		IUsuario usuario = this.construirUsuarioAdministrativo();
-		return usuario;
-	}
-
-	private IUsuario crearUsuario() {
+	private Usuario crearUsuario() {
 		return new Usuario();
 	}
 
-	/**
-	 * Construye un usuario base con los permisos comunes
-	 */
-	private IUsuario construirUsuarioComun() {
-
-		IUsuario usuario = this.crearUsuario();
-
-		usuario.addPermiso(new HomePagePermiso());
-
-		return usuario;
-	}
-	
-	/**
-	 * Construye un usuario administrativo con los permisos correspondientes
-	 */
-	private IUsuario construirUsuarioAdministrativo() {
-
-		IUsuario usuario = this.construirUsuarioComun();
-
-		usuario.addPermiso(new MapaCiudadPermiso());
-
-		return usuario;
-	}
 }

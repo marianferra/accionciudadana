@@ -27,26 +27,28 @@ td{
 }
 
 .observaciones{
-	position: absolute;
-   	padding:2px;
-   	text-align:left;
-   	margin-left: 3%;	
+	width: 200px;
 
 }
 
 .contenedorImagen{
-	width: 50em;	
+	width: 30em;	
 }
 
 .imagen{
 	width: 30em; 
-	height: 25em;	
+	height: 20em;	
 	float: left;
-    margin-left: 50px;
+    margin: 20px;
     width: auto;
 }
+
 
 .contenedorText{
 	width: 30em; 
 	height: 25em;	
+}
+
+.contenedorMapa{
+	width: 0em;
 }

@@ -16,16 +16,19 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 
+import wicket.contrib.gmap.api.GLatLng;
+import wicket.contrib.gmap.util.Geocoder;
 import ar.com.thinksoft.ac.intac.EnumBarriosReclamo;
 import ar.com.thinksoft.ac.intac.EnumPrioridadReclamo;
 import ar.com.thinksoft.ac.intac.EnumTipoReclamo;
 import ar.com.thinksoft.ac.intac.IReclamo;
-import ar.com.thinksoft.ac.webac.HomePage;
+import ar.com.thinksoft.ac.webac.AccionCiudadanaSession;
 import ar.com.thinksoft.ac.webac.logging.LogFwk;
 import ar.com.thinksoft.ac.webac.reclamo.ImageFactory;
 import ar.com.thinksoft.ac.webac.reclamo.Imagen;
 import ar.com.thinksoft.ac.webac.reclamo.Reclamo;
-import ar.com.thinksoft.ac.webac.web.Context;
+import ar.com.thinksoft.ac.webac.web.HomePage.HomePage;
+import ar.com.thinksoft.ac.webac.web.configuracion.Configuracion;
 
 @SuppressWarnings("serial")
 public class AltaReclamoForm extends Form<Reclamo> {
@@ -37,14 +40,20 @@ public class AltaReclamoForm extends Form<Reclamo> {
 		super(id);
 		setMultiPart(false);
 		
-		CompoundPropertyModel<Reclamo> model = new CompoundPropertyModel<Reclamo>(new Reclamo());
-		setModel(model);
+		CompoundPropertyModel<IReclamo> model = new CompoundPropertyModel<IReclamo>(new Reclamo());
+		setDefaultModel(model);
 		
 		TextField<String> calle = new TextField<String>("calleIncidente",this.createBind(model,"calleIncidente"));
 		add(calle);
 		
 		TextField<String> altura = new TextField<String>("alturaIncidente",this.createBind(model,"alturaIncidente"));
 		add(altura);
+		
+		TextField<String> latitudIncidente = new TextField<String>("latitudIncidente",this.createBind(model,"latitudIncidente"));
+		add(latitudIncidente);
+		
+		TextField<String> longitudIncidente = new TextField<String>("longitudIncidente",this.createBind(model,"longitudIncidente"));
+		add(longitudIncidente);
 		
 		TextField<String> ciudadanoTextBox = new TextField<String>("CiudadanoGeneradorReclamo",this.getName());
 		ciudadanoTextBox.setEnabled(false);
@@ -66,10 +75,12 @@ public class AltaReclamoForm extends Form<Reclamo> {
 			@Override
 		    protected void onSubmit(AjaxRequestTarget arg0) { 
 				final FileUpload file = fileUploadField.getFileUpload();
-				try {
-					img = new ImageFactory(file);
-				} catch (Exception e) {
-				}
+					try {
+						img = new ImageFactory(file);
+					} catch (Exception e) {
+						LogFwk.getInstance(AltaReclamoForm.class).error("Problemas al crear la imagen. Detalle: " + e.getMessage());
+						//TODO: dialogo error
+					}
 		    }
 			@Override
 			protected void onError(AjaxRequestTarget target){
@@ -82,24 +93,58 @@ public class AltaReclamoForm extends Form<Reclamo> {
 		
 		
 		add(new Button("guardarReclamo") {
+				@SuppressWarnings("unchecked")
 				@Override
 				public void onSubmit() {
-					Reclamo reclamo = _self.getModelObject();
+					IModel<IReclamo> model = (IModel<IReclamo>) _self.getDefaultModel();
+					IReclamo reclamo = model.getObject();
 					if(!isReclamoNoValido(reclamo)){
 						//metodos agregados a mano
 						reclamo.setId();
-						reclamo.setPrioridad(EnumPrioridadReclamo.noAsignada.getPrioridad());
-						reclamo.setImagen(new Imagen(img.getFileBytes(),img.getContentType(),img.getFileName()));
-						reclamo.setComunaIncidente();
-						reclamo.setCiudadanoGeneradorReclamo(Context.getInstance().getUsuario().getNombreUsuario());
+						
+						try {
+							reclamo.setPrioridad(EnumPrioridadReclamo.noAsignada.getPrioridad());
+						} catch (Exception e1) {
+							LogFwk.getInstance(AltaReclamoForm.class).error("No se pudo enviar mail al cambiar prioridad. Detalle: " + e1.getMessage());
+						}
+						
+						if(img != null){
+							reclamo.setImagen(new Imagen(img.getFileBytes(),img.getContentType(),img.getFileName()));
+							img.deleteImage();
+						}
+						reclamo.setCiudadanoGeneradorReclamo(((AccionCiudadanaSession)getSession()).getUsuario().getNombreUsuario());
+						reclamo.setMailCiudadanoGeneradorReclamo(((AccionCiudadanaSession)getSession()).getUsuario().getMail());
 						Date fecha = new Date();
 						SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
 						reclamo.setFechaReclamo(formato.format(fecha));
 						reclamo.setFechaUltimaModificacionReclamo(formato.format(fecha));
 						//fin metodos agregados a mano
 						
-						reclamo.activar();
-						img.deleteImage();
+						/*
+						 * CONVERSION CALLE A COORDENADAS GPS
+						 */
+						GLatLng coordenadas = null;
+						Double latitud,longitud;
+						String direccion = reclamo.getCalleIncidente() + " " + reclamo.getAlturaIncidente() + ",Capital Federal";
+						Geocoder geocoder = new Geocoder(Configuracion.getInstance().getKeyGoogleMap());
+						try {
+							 coordenadas = geocoder.geocode(direccion);
+							 latitud = coordenadas.getLat();
+							 longitud = coordenadas.getLng();
+							 reclamo.setLatitudIncidente(latitud.toString());
+							 reclamo.setLongitudIncidente(longitud.toString());
+						} catch (Exception e) {
+							LogFwk.getInstance(AltaReclamoPage.class).error("Problema al generar coordenadas. Detalle: " + e);
+							//TODO: dialogo error
+						}
+						
+						// FIN CONVERSION CALLE A COORDENADAS GPS
+						try{
+							reclamo.activar();
+						} catch (Exception e1) {
+							LogFwk.getInstance(AltaReclamoForm.class).error("No se pudo enviar mail al crear el reclamo. Detalle: " + e1.getMessage());
+						}
+						
 						setResponsePage(HomePage.class);
 					}
 		        }
@@ -120,7 +165,7 @@ public class AltaReclamoForm extends Form<Reclamo> {
 		
 	}
 	
-	private IModel<String> createBind(CompoundPropertyModel<Reclamo> model,String property){
+	private IModel<String> createBind(CompoundPropertyModel<IReclamo> model,String property){
 		return model.bind(property);
 	}
 	
@@ -133,7 +178,7 @@ public class AltaReclamoForm extends Form<Reclamo> {
 
 			@Override
 			public String getObject() {
-				return Context.getInstance().getUsuario().getNombreUsuario();
+				return ((AccionCiudadanaSession)getSession()).getUsuario().getNombreUsuario();
 			}
 
 			@Override

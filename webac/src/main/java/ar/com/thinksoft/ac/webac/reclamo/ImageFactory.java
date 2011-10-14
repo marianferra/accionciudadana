@@ -7,10 +7,12 @@ import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.util.file.File;
 
 import ar.com.thinksoft.ac.intac.IImagen;
+import ar.com.thinksoft.ac.webac.exceptions.FormatoImagenException;
+import ar.com.thinksoft.ac.webac.logging.LogFwk;
+import ar.com.thinksoft.ac.webac.web.configuracion.Configuracion;
 
 public class ImageFactory {
 	
-	private static final String PATH = "src/main/webapp/tempImages/";
 	private File image;
 	private File directorio;
 	
@@ -19,6 +21,7 @@ public class ImageFactory {
 	private String contentTypeImagen;
 	
 	public ImageFactory(FileUpload file) throws Exception{
+		Configuracion.getInstance().cargarConfiguracion();
 		bytesImagen = file.getBytes();
 		fileNameImagen = file.getClientFileName();
 		contentTypeImagen = file.getContentType();
@@ -27,6 +30,7 @@ public class ImageFactory {
 	}
 	
 	public ImageFactory(IImagen imagen) throws Exception{
+		Configuracion.getInstance().cargarConfiguracion();
 		bytesImagen = imagen.getBytes();
 		fileNameImagen = imagen.getFileName();
 		contentTypeImagen = imagen.getContentType();
@@ -38,14 +42,16 @@ public class ImageFactory {
 
 	private void createImage(InputStream stream, String fileName, String contentType) throws Exception{
 		if("image/jpeg".equals(contentType) || "image/jpg".equals(contentType)||"image/png".equals(contentType)
-		||"image/bmp".equals(contentType)||"image/gif".equals(contentType)){
+		||"image/bmp".equals(contentType)||"image/gif".equals(contentType) || "jpg".equals(contentType)){
 			
-			image = new File(PATH + fileName);
+			image = new File(Configuracion.getInstance().getPathTempImages() + fileName);
 			if(!image.exists())
 				image.createNewFile();
 			image.write(stream);
-		}else
-			throw new Exception("no tiene un formato válido");
+		}else{
+			LogFwk.getInstance(ImageFactory.class).error("La imagen no tiene un formato valido");
+			throw new FormatoImagenException("La imagen no tiene un formato valido.");
+		}
 	}
 	
 	public void deleteImage(){
@@ -54,7 +60,7 @@ public class ImageFactory {
 	}
 	
 	private void crearDirectorioTemporal(){
-		directorio = new File(PATH);
+		directorio = new File(Configuracion.getInstance().getPathTempImages());
 		if(!directorio.exists()){
 			directorio.mkdir();
 		}

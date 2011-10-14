@@ -1,0 +1,125 @@
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+
+	<head>
+		<title>Usuarios</title>
+	</head>
+
+	<body>
+		<wicket:extend>
+			<div>
+				<div align="center">
+					<h1>Listado de Usuarios</h1>
+				</div>
+				<form wicket:id="form">
+		
+				<table align="center">
+					<tr>
+						<td>
+							<table>
+								<tr>
+									<td>
+										<div>
+											<label>Nombre: </label>
+										</div>
+									</td>
+							
+									<td>
+										<div class="block">		
+									 		<input type="text" wicket:id="campoBusquedaNombre" id="campoBusquedaNombre" />
+										</div>
+								 	</td>
+								</tr>
+							</table>
+						</td>
+						<td>	
+							<table>
+								<tr>
+									<td>
+										<div>
+											<label>Apellido: </label>
+										</div>
+									</td>
+							
+									<td>
+										<div class="block">
+									 		<input type="text" wicket:id="campoBusquedaApellido" id="campoBusquedaApellido" />
+								 		</div>
+								 	</td>
+								</tr>
+							</table>
+						</td>
+						<td>	
+							<table>
+								<tr>
+									<td>
+										<div>
+											<label>Nombre de usuario: </label>
+										</div>
+									</td>
+							
+									<td>
+										<div class="block">		
+									 		<input type="text" wicket:id="campoBusquedaNombreUsuario" id="campoBusquedaNombreUsuario" />
+										</div>
+								 	</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+					
+				<table align="center">
+					<tr>
+						<td>
+							<div class="block">
+								<input type="submit" wicket:id="botonBuscar" value="Buscar usuario"/>
+							</div>
+						</td>
+					</tr>
+				</table>
+				
+					
+				<table align="center">
+					<tr>
+						<td>
+							<div wicket:id="grid" align="center" class="block grid"></div>
+						</td>
+					</tr>
+				</table>
+					
+					
+				<table align="center">
+					<tr>
+						<td>
+							<table>
+								<tr>
+									<td>
+										<div class="block">
+											<input type="submit" wicket:id="botonNuevo" value="Nuevo Usuario"/>
+										</div>
+									</td>
+									
+									<td>
+										<div class="block">
+											<input type="button" wicket:id="eliminar" value="Eliminar Usuario"/>
+										</div>
+										<div wicket:id="dialogEliminar">
+				                			<div class="dialogo">
+				                    			<p >¿Est&aacute; seguro que desea eliminar este usuario?</p>
+				                    			<input type="button" wicket:id="eliminarUsuario" value="Si" style="margin:10px;"/>
+				                    			<input type="button" wicket:id="volver" value="No" style="margin:10px;"/>
+				                			</div>
+            							</div>	
+									</td>
+									
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+					
+				</form>
+			</div>
+		</wicket:extend>
+	</body>
+</html>

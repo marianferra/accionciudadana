@@ -1,6 +1,7 @@
 package ar.com.thinksoft.ac.intac;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Interfaz a implementar para reclamo tanto en la parte Android como en la parte de Dominio Web
@@ -29,60 +30,87 @@ public interface IReclamo extends Serializable{
 	
 	public String getCiudadanoGeneradorReclamo();
 	
-	public String getObservaciones();
+	public String getMailCiudadanoGeneradorReclamo();
 	
-	public String getBarrioIncidente();
+	public  String getObservaciones();
 	
-	public String getComunaIncidente();
+	public  String getBarrioIncidente();
 	
-	public IImagen getImagen();
+	public  String getComunaIncidente();
 	
-	public IEstadoReclamo getEstado();
+	public  IImagen getImagen();
 	
-	public String getEstadoDescripcion();
+	public  String getEstadoDescripcion();
 	
-	public String getPrioridad();
+	public  String getPrioridad();
+	
+	public  List<IReclamo> getReclamosAsociados();
 	
 	// Fin obtencion de atributos
 	
 	// Setear atributos
 	
-	public void setId();
+	public  void setId();
 	
-	public void setCalleIncidente(String calle);
+	public  void setCalleIncidente(String calle);
 	
-	public void setAlturaIncidente(String altura);
+	public  void setAlturaIncidente(String altura);
 	
-	public void setLatitudIncidente(String latitud);
+	public  void setLatitudIncidente(String latitud);
 	
-	public void setLongitudIncidente(String longitud);
+	public  void setLongitudIncidente(String longitud);
 	
-	public void setTipoIncidente(String tipo);
+	public  void setTipoIncidente(String tipo);
 	
-	public void setFechaReclamo(String fechaYHora);
+	public  void setFechaReclamo(String fechaYHora);
 	
-	public void setFechaUltimaModificacionReclamo(String fecha);
+	public  void setFechaUltimaModificacionReclamo(String fecha);
 	
-	public void setCiudadanoGeneradorReclamo(String ciudadano);
+	public  void setCiudadanoGeneradorReclamo(String ciudadano);
 	
-	public void setObservaciones(String observaciones);
+	public  void setMailCiudadanoGeneradorReclamo(String mail);
 	
-	public void setBarrioIncidente(String barrio);
+	public  void setObservaciones(String observaciones);
 	
-	public void setComunaIncidente();
+	public  void setBarrioIncidente(String barrio);
 	
-	public void setImagen(IImagen imagen);
+	public  void setComunaIncidentePorBarrio(String barrio);
 	
-	public void setEstado(IEstadoReclamo estado);
+	public  void setComunaIncidente(String comuna);
 	
-	public void setPrioridad(String prioridad);
+	public  void setImagen(IImagen imagen);
+	
+	public  void setPrioridad(String prioridad) throws Exception;
 
-	public void clone(IReclamo reclamoOriginal);
+	public  void clone(IReclamo reclamoOriginal);
 
-	public void cambiarEstado(String estadoDescripcion);
-	
+	public  void cambiarEstado(String estadoDescripcion) throws Exception;
+
 	// Fin seteo atributos
 	
+	//Metodos que no hace falta implementar en Android.
+	 
+	public  boolean isNotDown();
+	
+	public  boolean isIgual(IReclamo reclamo);
+	
+	public  void unificar(IReclamo reclamo) throws Exception;
+	
+	public  void cancelarReclamo() throws Exception;
+
+	public  void setAsociadoReclamo() throws Exception;
+	
+	public  void suspender() throws Exception;
+
+	public  void activar() throws Exception;
+	
+	public  void enProgreso() throws Exception;
+	
+	public  void demorar() throws Exception;
+	
+	public  void terminar() throws Exception;
+
+	public void setEstadoDescripcion(String estado);
 	
 }
 

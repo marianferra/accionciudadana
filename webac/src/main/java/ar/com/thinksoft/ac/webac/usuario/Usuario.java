@@ -1,67 +1,40 @@
 package ar.com.thinksoft.ac.webac.usuario;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import ar.com.thinksoft.ac.intac.IPermiso;
-import ar.com.thinksoft.ac.intac.IPermitible;
+import org.apache.wicket.authorization.strategies.role.Roles;
 import ar.com.thinksoft.ac.intac.IUsuario;
 
 @SuppressWarnings("serial")
 public class Usuario implements IUsuario {
 
-	private List<IPermiso> permisos;
+	private Roles permisos;
 	private String nombreUsuario;
 	private String contrasenia;
-	private Long telefono;
+	private String telefono;
 	private String nombre;
 	private String apellido;
 	private String mail;
-	private Long dni;
+	private String dni;
 
 	public Usuario() {
-		this.permisos = new ArrayList<IPermiso>();
+		this.permisos = new Roles();
 		this.setApellido("");
 		this.setContrasenia("");
-		this.setDni(0L);
+		this.setDni("");
 		this.setMail("");
 		this.setNombre("");
 		this.setNombreUsuario("");
-		this.setTelefono(0L);
+		this.setTelefono("");
 	}
 
-	@Override
-	public boolean tenesPermisosPara(IPermitible permitible) {
-		return this.posee(permitible.getPermisoNecesario());
+	public void addRole(String role) {
+		this.permisos.add(role);
 	}
-
-	/**
-	 * Determina si el permiso que se le pasa por parametro esta dentro de su
-	 * coleccion de permisos
-	 */
-	private boolean posee(IPermiso permiso) {
-
-		for (IPermiso permisoPropio : this.getPermisos()) {
-			if (permisoPropio.equals(permiso))
-				return true;
-		}
-
-		return false;
-	}
-
-	public void addPermiso(IPermiso permiso) {
-		this.permisos.add(permiso);
-	}
-
+	
 	// ************************* GETTERS & SETTERS ***********************
 
-	private List<IPermiso> getPermisos() {
+	public Roles getRoles() {
 		return this.permisos;
-	}
-
-	@Override
-	public int cantidadPermisos() {
-		return this.getPermisos().size();
 	}
 
 	@Override
@@ -91,7 +64,7 @@ public class Usuario implements IUsuario {
 	}
 
 	@Override
-	public Long getDni() {
+	public String getDni() {
 		return this.dni;
 	}
 
@@ -111,12 +84,12 @@ public class Usuario implements IUsuario {
 	}
 
 	@Override
-	public Long getTelefono() {
+	public String getTelefono() {
 		return this.telefono;
 	}
 
 	@Override
-	public void setDni(Long dni) {
+	public void setDni(String dni) {
 		this.dni = dni;
 	}
 
@@ -136,8 +109,9 @@ public class Usuario implements IUsuario {
 	}
 
 	@Override
-	public void setTelefono(Long telefono) {
+	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
+
 
 }
