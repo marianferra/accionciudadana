@@ -44,14 +44,14 @@ public class LoginForm extends Form<Void> {
 
 	@Override
 	protected void onSubmit() {
-
+		
 		Login login = new Login(this.nombreUsuario,this.contrasenia);
 
 		try {
 			Usuario usuario = login.login();
-			//TODO: adri, verifica esto!
 			if(usuario.getRoles().size()==0){
 				usuario.addRole("CIUDADANO");
+				usuario.addRole("ALL");
 				Repository.getInstance().store(usuario);
 			}
 			((AccionCiudadanaSession)getSession()).login(usuario);
@@ -60,7 +60,7 @@ public class LoginForm extends Form<Void> {
 			if (!login.isUsuarioExistente())
 				error(e.getLocalizedMessage());
 			else
-				error("La contrasenia ingresada no es valida.");
+				error("El usuario no se encuentra registrado en el sistema o ha ingresado mal la clave.");
 		}
 	}
 

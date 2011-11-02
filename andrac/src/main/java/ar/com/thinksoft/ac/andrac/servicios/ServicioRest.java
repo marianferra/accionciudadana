@@ -25,7 +25,6 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
-import ar.com.thinksoft.ac.andrac.R;
 import ar.com.thinksoft.ac.andrac.contexto.Aplicacion;
 import ar.com.thinksoft.ac.andrac.contexto.Repositorio;
 import ar.com.thinksoft.ac.andrac.dominio.Reclamo;
@@ -38,7 +37,7 @@ import com.google.gson.reflect.TypeToken;
 /**
  * Se encarga de correr en 2do plano todas las funciones de conexion a servidor.
  * 
- * @since 10-10-2011
+ * @since 16-10-2011
  * @author Paul
  */
 public class ServicioRest extends IntentService {
@@ -47,7 +46,11 @@ public class ServicioRest extends IntentService {
 	public static final int FIN = 1;
 	public static final int ERROR = -1;
 	public static final String FUN = "funcion";
+	public static final String HTTP_COD = "codigo";
 	public static final String REC = "receptor";
+
+	// Almacena temporalmente la respuesta.
+	HttpResponse respuestaHttp = null;
 
 	public ServicioRest() {
 		super("ServicioRest");
@@ -56,7 +59,7 @@ public class ServicioRest extends IntentService {
 	/**
 	 * Atiende la creacion de un servicio.
 	 * 
-	 * @since 08-10-2011
+	 * @since 16-10-2011
 	 * @author Paul
 	 */
 	@Override
@@ -66,59 +69,66 @@ public class ServicioRest extends IntentService {
 		Log.d(this.getClass().getName(), "Funcion: " + funcion);
 
 		Bundle bundle = new Bundle();
+		int codigoHttp = -1;
+		int retorno = ERROR;
 		try {
 			bundle.putString(FUN, funcion);
 			receptor.send(RUN, bundle);
 			if (FuncionRest.GETRECLAMOS.equals(funcion)) {
 				// Funcion GET Reclamos.
-				this.getReclamos(getString(R.string.url_wilsond), this
-						.getRepo().getNick(), this.getRepo().getPass());
+				this.getReclamos(this.getRepo().getUrlServer(), this.getRepo()
+						.getNick(), this.getRepo().getPass());
 			} else if (FuncionRest.GETPERFIL.equals(funcion)) {
 				// Funcion GET Perfil.
-				this.getPerfil(getString(R.string.url_wilsond), this.getRepo()
+				this.getPerfil(this.getRepo().getUrlServer(), this.getRepo()
 						.getNick(), this.getRepo().getPass());
 			} else if (FuncionRest.POSTRECLAMO.equals(funcion)) {
 				// Funcion POST Reclamo.
-				this.postReclamo(getString(R.string.url_wilsond), this
-						.getRepo().getNick(), this.getRepo().getPass(), this
-						.getRepo().getReclamoAEnviar());
+				this.setRespuestaHttp(this.postReclamo(this.getRepo()
+						.getUrlServer(), this.getRepo().getNick(), this
+						.getRepo().getPass(), this.getRepo()
+						.getReclamoAEnviar()));
 			} else if (FuncionRest.POSTUSUARIO.equals(funcion)) {
 				// Funcion POST Usuario.
-				this.postUsuario(getString(R.string.url_wilsond), this
-						.getRepo().getUsuarioARegistrar());
+				this.setRespuestaHttp(this.postUsuario(this.getRepo()
+						.getUrlServer(), this.getRepo().getUsuarioARegistrar()));
 			} else {
-				// Funcion desconocida!
-				bundle.putString(FUN, funcion);
-				receptor.send(ERROR, bundle);
-				this.stopSelf();
+				// Funcion desconocida.
 				Log.e(this.getClass().getName(), "Funcion desconocida!");
-				return;
+				throw new Exception("Funcion desconocida!");
 			}
-			bundle.putString(FUN, funcion);
-			receptor.send(FIN, bundle);
-			this.stopSelf();
+			retorno = FIN;
 		} catch (ClientProtocolException e) {
-			bundle.putString(FUN, funcion);
-			receptor.send(ERROR, bundle);
-			this.stopSelf();
-			Log.e(this.getClass().getName(), e.toString());
+			retorno = ERROR;
+			Log.e(this.getClass().getName(), "Error HTTP: " + e.toString());
 		} catch (IOException e) {
-			bundle.putString(FUN, funcion);
-			receptor.send(ERROR, bundle);
-			this.stopSelf();
+			retorno = ERROR;
 			Log.e(this.getClass().getName(), e.toString());
 		} catch (Exception e) {
-			bundle.putString(FUN, funcion);
-			receptor.send(ERROR, bundle);
-			this.stopSelf();
+			retorno = ERROR;
 			Log.e(this.getClass().getName(), e.toString());
+		} finally {
+			codigoHttp = this.getRespuestaHttp() != null ? this
+					.getRespuestaHttp().getStatusLine().getStatusCode() : -1;
+			bundle.putInt(HTTP_COD, codigoHttp);
+			bundle.putString(FUN, funcion);
+			receptor.send(retorno, bundle);
+			Log.e(this.getClass().getName(), "STOP. Retorno: " + retorno
+					+ " CodigoHTTP: " + codigoHttp);
+			this.stopSelf();
 		}
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.i(this.getClass().getName(), "Llamaron a onDestroy()...");
+		super.onDestroy();
 	}
 
 	/**
 	 * Obtiene los reclamos del servidor Rest.
 	 * 
-	 * @since 08-10-2011
+	 * @since 16-10-2011
 	 * @author Paul
 	 * @param url
 	 *            URL del servidor.
@@ -130,8 +140,11 @@ public class ServicioRest extends IntentService {
 		DefaultHttpClient httpClient = new DefaultHttpClient();
 		HttpGet method = new HttpGet(url + "/" + FuncionRest.GETRECLAMOS + "/"
 				+ nick + "/" + pass);
-		HttpResponse httpResponse = httpClient.execute(method);
-		InputStream is = httpResponse.getEntity().getContent();
+		this.setRespuestaHttp(httpClient.execute(method));
+		if (this.getRespuestaHttp().getStatusLine().getStatusCode() != 200) {
+			throw new ClientProtocolException();
+		}
+		InputStream is = this.getRespuestaHttp().getEntity().getContent();
 		Gson gson = new Gson();
 		Reader reader = new InputStreamReader(is);
 		Type collectionType = new TypeToken<List<Reclamo>>() {
@@ -143,7 +156,7 @@ public class ServicioRest extends IntentService {
 	/**
 	 * Obtiene perfil de usuario del servidor Rest.
 	 * 
-	 * @since 29-09-2011
+	 * @since 16-10-2011
 	 * @author Paul
 	 * @param url
 	 *            URL del servidor.
@@ -155,8 +168,13 @@ public class ServicioRest extends IntentService {
 		DefaultHttpClient httpClient = new DefaultHttpClient();
 		HttpGet method = new HttpGet(url + "/" + FuncionRest.GETPERFIL + "/"
 				+ nick + "/" + pass);
-		HttpResponse httpResponse = httpClient.execute(method);
-		InputStream is = httpResponse.getEntity().getContent();
+		this.setRespuestaHttp(httpClient.execute(method));
+		Log.i(this.getClass().getName(), "HTTP Respuesta: "
+				+ this.getRespuestaHttp().getStatusLine().toString());
+		if (this.getRespuestaHttp().getStatusLine().getStatusCode() != 200) {
+			throw new ClientProtocolException();
+		}
+		InputStream is = this.getRespuestaHttp().getEntity().getContent();
 		Gson gson = new Gson();
 		Reader reader = new InputStreamReader(is);
 		Usuario perfil = gson.fromJson(reader, Usuario.class);
@@ -315,5 +333,15 @@ public class ServicioRest extends IntentService {
 				altura + " " + calle + ", " + "Buenos Aires, Argentina", 0)
 				.get(0);
 		// XXX Hasta aqui probando Goeocoder....
+	}
+
+	/* ************ Getters y Setters ************* */
+
+	private HttpResponse getRespuestaHttp() {
+		return respuestaHttp;
+	}
+
+	private void setRespuestaHttp(HttpResponse respuestaHttp) {
+		this.respuestaHttp = respuestaHttp;
 	}
 }

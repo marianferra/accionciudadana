@@ -6,7 +6,6 @@ import ar.com.thinksoft.ac.intac.IUsuario;
 import ar.com.thinksoft.ac.intac.utils.classes.UsuarioMovil;
 import ar.com.thinksoft.ac.webac.usuario.Usuario;
 import ar.com.thinksoft.ac.wilsond.Repositorio.Repositorio;
-import ar.com.thinksoft.ac.wilsond.mail.MailWilsonD;
 
 public class UsuarioManager {
 	
@@ -81,7 +80,7 @@ private static UsuarioManager instance;
 		usuario.setDni(usuarioAndrac.getDni());
 		usuario.setMail(usuarioAndrac.getMail());
 		usuario.setTelefono(usuarioAndrac.getTelefono());
-		usuario.setNombreUsuario(usuarioAndrac.getNombreUsuario());
+		usuario.setNombreUsuario(usuarioAndrac.getNombreUsuario().toLowerCase().replace(" ", ""));
 		usuario.setContrasenia(usuarioAndrac.getContrasenia());
 		return usuario;
 		}catch(Exception e){
@@ -91,8 +90,7 @@ private static UsuarioManager instance;
 	
 	public void guardarUsuario(IUsuario usuario){
 		Repositorio.getInstancia().store(usuario);
-		MailWilsonD.getInstance().enviarMail(usuario.getMail(), 
-				"Accion Ciudadana - Bienvenido", MailWilsonD.getInstance().armarTextoBienvenida(usuario));
+		
 	}
 	
 }

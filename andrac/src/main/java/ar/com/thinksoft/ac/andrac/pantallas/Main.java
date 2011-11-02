@@ -1,14 +1,14 @@
 package ar.com.thinksoft.ac.andrac.pantallas;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -24,12 +24,11 @@ import ar.com.thinksoft.ac.intac.utils.classes.FuncionRest;
 /**
  * La clase se encarga de manejar la pantalla Home.
  * 
- * @since 10-10-2011
+ * @since 14-10-2011
  * @author Paul
  */
 public class Main extends Activity {
 
-	private static final int ERROR_CONEXION = -1;
 	private final int INICIAR_RECLAMO = 0;
 	private final int LISTA_RECLAMOS = 1;
 	private final int RECLAMOS_GUARDADOS = 2;
@@ -102,7 +101,6 @@ public class Main extends Activity {
 			Log.e(this.getClass().getName(),
 					"No pudo ejecutar: "
 							+ data.getStringExtra(ServicioRest.FUN));
-			this.mostrarDialogo(ERROR_CONEXION);
 		} else if (resultCode == Activity.RESULT_FIRST_USER) {
 			Log.d(this.getClass().getName(), "Usuario cancelo ejecucion: "
 					+ data.getStringExtra(ServicioRest.FUN));
@@ -116,7 +114,7 @@ public class Main extends Activity {
 	 * Detecta el evento del boton fisico que cancela la aplicacion. Cierra la
 	 * aplicacion. Otros botones delega para arriba.
 	 * 
-	 * @since 10-10-2011
+	 * @since 14-10-2011
 	 * @author Paul
 	 * @param keyCode
 	 *            Codigo del boton presionado.
@@ -129,37 +127,45 @@ public class Main extends Activity {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			this.salir();
 			return true;
-		} else {
+		}
+		// else if (keyCode == KeyEvent.KEYCODE_MENU) {
+		// this.mostrarVentanaConfiguracion();
+		// return true;
+		// }
+		else {
 			return super.onKeyDown(keyCode, event);
 		}
 	}
 
 	/**
-	 * Crea ventanas de dialogo. (Se hace de esta forma en Android 2.2)
+	 * Detecta el boton Menu para mostrar el menu de Configuracion.
 	 * 
-	 * @since 10-10-2011
-	 * @author Paul
+	 * @since 01-11-11
+	 * @author Marian
 	 */
 	@Override
-	protected Dialog onCreateDialog(int tipo) {
-		Dialog unDialog = null;
-		switch (tipo) {
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.configuracion, menu);
+		return true;
+	}
 
-		case ERROR_CONEXION:
-			unDialog = new AlertDialog.Builder(Main.this)
-					.setIcon(R.drawable.alert_dialog_icon)
-					.setTitle(R.string.error_conexion)
-					.setMessage(R.string.mensaje_error_conexion)
-					.setPositiveButton(R.string.ok,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int whichButton) {
-									/* Solo cierra el dialogo */
-								}
-							}).create();
-			break;
+	/**
+	 * Detecta si se presiono el boton Menu para mostrar la ventana de
+	 * Configuracion.
+	 * 
+	 * @since 01-11-11
+	 * @author Marian
+	 */
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.config_svr:
+			this.mostrarVentanaConfiguracion();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
-		return unDialog;
 	}
 
 	/**
@@ -172,16 +178,6 @@ public class Main extends Activity {
 		Intent proceso = new Intent(this, Login.class);
 		proceso.putExtra(ServicioRest.FUN, funcion);
 		this.startActivityForResult(proceso, 0);
-	}
-
-	/**
-	 * Muestra una ventana de dialogo.
-	 * 
-	 * @since 10-10-2011
-	 * @author Paul
-	 */
-	private void mostrarDialogo(int idice) {
-		this.showDialog(idice);
 	}
 
 	/**
@@ -305,4 +301,15 @@ public class Main extends Activity {
 		this.startActivity(new Intent(this, Registro.class));
 	}
 
+	/**
+	 * Muestra la ventana de configuracion.
+	 * 
+	 * @since 14-10-2011
+	 * @author Paul
+	 */
+	private void mostrarVentanaConfiguracion() {
+		// this.startActivity(new Intent(this, Configuracion.class));
+		Intent intent = new Intent(this, MainPreference.class);
+		startActivity(intent);
+	}
 }

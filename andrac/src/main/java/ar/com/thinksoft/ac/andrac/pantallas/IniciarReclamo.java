@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Random;
 
-import com.google.gson.Gson;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -40,6 +38,8 @@ import ar.com.thinksoft.ac.andrac.servicios.ServicioRest;
 import ar.com.thinksoft.ac.intac.EnumBarriosReclamo;
 import ar.com.thinksoft.ac.intac.EnumTipoReclamo;
 import ar.com.thinksoft.ac.intac.utils.classes.FuncionRest;
+
+import com.google.gson.Gson;
 
 /**
  * Maneja creacion de un reclamo.
@@ -563,5 +563,6 @@ public class IniciarReclamo extends Activity implements LocationListener {
 				Context.MODE_PRIVATE);
 		stream.write(reclamoString.getBytes());
 		stream.close();
+		Log.d(this.getClass().getName(), "Se guardo archivo: " + nombreArchivo);
 	}
 }

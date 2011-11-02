@@ -1,5 +1,7 @@
 package ar.com.thinksoft.ac.andrac.pantallas;
 
+import java.net.HttpURLConnection;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,6 +13,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,24 +24,26 @@ import android.widget.Toast;
 import ar.com.thinksoft.ac.andrac.R;
 import ar.com.thinksoft.ac.andrac.contexto.Aplicacion;
 import ar.com.thinksoft.ac.andrac.contexto.Repositorio;
+import ar.com.thinksoft.ac.andrac.listener.TextCorrector;
 import ar.com.thinksoft.ac.andrac.servicios.ReceptorRest;
 import ar.com.thinksoft.ac.andrac.servicios.ReceptorResultados;
 import ar.com.thinksoft.ac.andrac.servicios.ServicioRest;
 import ar.com.thinksoft.ac.intac.utils.classes.FuncionRest;
 
 /**
- * Pantalla transparente que maneja los servicios y pide autentificacion.
+ * Pantalla transparente que maneja los servicios de conexion. Pide
+ * autentificacion y muestra los mensajes de error.
  * 
- * @since 12-10-2011
+ * @since 25-10-2011
  * @author Paul
  * 
  */
 public class Login extends Activity implements ReceptorRest {
 
+	private final String HTTP = "http://";
+
 	private static final int LOGIN = 0;
-	private static final int LOGIN_FAIL = 1;
-	private static final int SERVER_ERROR = 2;
-	private static final int CAMPOS_VACIOS = 3;
+	private static final int CAMPOS_VACIOS = -10;
 
 	private static final String ANDRAC_NICK = "andrac_nick";
 	private static final String ANDRAC_PASS = "andrac_pass";
@@ -75,13 +80,15 @@ public class Login extends Activity implements ReceptorRest {
 	/**
 	 * Revisa si tiene que pedir autenticacion.
 	 * 
-	 * @since 08-10-2011
+	 * @since 14-10-2011
 	 * @author Paul
 	 */
 	@Override
 	protected void onStart() {
 		super.onStart();
-		// TODO implementar Login.
+
+		this.obtenerURL();
+
 		// Login no se muestra cuando ya esta autenticado o cuando la funcion es
 		// POST Usuario.
 		if ((FuncionRest.POSTUSUARIO.equals(this.funcionAEjecutar))
@@ -108,7 +115,7 @@ public class Login extends Activity implements ReceptorRest {
 	/**
 	 * Crea la ventana de dialogo. (Se hace de esta forma en Android 2.2)
 	 * 
-	 * @since 12-10-2011
+	 * @since 25-10-2011
 	 * @author Paul
 	 */
 	@Override
@@ -122,13 +129,15 @@ public class Login extends Activity implements ReceptorRest {
 			View layout = inflater.inflate(R.layout.login_dialogo,
 					(ViewGroup) findViewById(R.id.login_dialogo));
 			campoNick = (EditText) layout.findViewById(R.id.nick);
+			campoNick.addTextChangedListener(new TextCorrector(campoNick));
 			campoPass = (EditText) layout.findViewById(R.id.pass);
+			campoPass.addTextChangedListener(new TextCorrector(campoPass));
 			checkPreferencias = (CheckBox) layout
 					.findViewById(R.id.guardar_pass);
 			dialogo = new AlertDialog.Builder(Login.this)
 					.setCancelable(false)
 					.setIcon(R.drawable.lock)
-					.setTitle(tituloDialogo)
+					.setTitle(getTituloDialogo())
 					.setView(layout)
 					.setPositiveButton(R.string.ok,
 							new DialogInterface.OnClickListener() {
@@ -162,8 +171,8 @@ public class Login extends Activity implements ReceptorRest {
 			// Dialogo comun de Error.
 			dialogo = new AlertDialog.Builder(Login.this)
 					.setIcon(R.drawable.alert_dialog_icon)
-					.setTitle(tituloDialogo)
-					.setMessage(mensageDialogo)
+					.setTitle(getTituloDialogo())
+					.setMessage(getMensageDialogo())
 					.setPositiveButton(R.string.ok,
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
@@ -223,8 +232,13 @@ public class Login extends Activity implements ReceptorRest {
 
 			// Servicio Fallo: Cierra dialogo procesando.
 			this.cerrarProcesando();
+
+			// Muestra un dialogo de error
+			int codigoHttp = funcionData.getInt(ServicioRest.HTTP_COD);
+			this.mostrarDialogo(codigoHttp);
+
 			// Vuelve a la ventana anterior.
-			this.salirDePantalla(funcion, RESULT_CANCELED);
+			// XXX this.salirDePantalla(funcion, RESULT_CANCELED, mensaje);
 			break;
 		}
 	}
@@ -232,34 +246,44 @@ public class Login extends Activity implements ReceptorRest {
 	/**
 	 * Muestra una ventana de dialogo segun la necesidad.
 	 * 
-	 * @since 23-08-2011
+	 * @since 16-10-2011
 	 * @author Paul
 	 */
 	private void mostrarDialogo(int codigo) {
 		// Asi, por que no se puede pasar los atributos directamente al Dialogo.
-		switch (codigo) {
-		case LOGIN:
-			this.tituloDialogo = getString(R.string.login_titulo);
-			this.showDialog(codigo);
-			break;
-		case LOGIN_FAIL:
-			this.tituloDialogo = getString(R.string.advertencia);
-			this.mensageDialogo = getString(R.string.nick_pass_fail);
-			this.showDialog(codigo);
-			break;
-		case SERVER_ERROR:
-			this.tituloDialogo = getString(R.string.advertencia);
-			this.mensageDialogo = getString(R.string.server_inaccesible);
-			this.showDialog(codigo);
-			break;
-		case CAMPOS_VACIOS:
-			this.tituloDialogo = getString(R.string.atencion);
-			this.mensageDialogo = getString(R.string.campo_vacio);
-			this.showDialog(codigo);
-			break;
-		default:
-			break;
+
+		try {
+			switch (codigo) {
+			case LOGIN:
+				this.setTituloDialogo(getString(R.string.login_titulo));
+				this.showDialog(codigo);
+				break;
+			case CAMPOS_VACIOS:
+				this.setTituloDialogo(getString(R.string.atencion));
+				this.setMensageDialogo(getString(R.string.campo_vacio));
+				this.showDialog(codigo);
+				break;
+			case HttpURLConnection.HTTP_INTERNAL_ERROR:
+				this.setTituloDialogo(getString(R.string.advertencia));
+				this.setMensageDialogo(getString(R.string.error_conexion_servidor));
+				this.showDialog(codigo);
+				break;
+			case HttpURLConnection.HTTP_FORBIDDEN:
+				this.setTituloDialogo(getString(R.string.advertencia));
+				this.setMensageDialogo(getString(R.string.nick_pass_fail));
+				this.showDialog(codigo);
+				break;
+			default:
+				this.setTituloDialogo(getString(R.string.advertencia));
+				this.setMensageDialogo(getString(R.string.mensaje_error_conexion));
+				this.showDialog(codigo);
+				break;
+			}
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "SALUDOS DEL MAS ALLA: " + e);
+			// No hago nada, muere aqui.
 		}
+
 	}
 
 	/**
@@ -375,6 +399,39 @@ public class Login extends Activity implements ReceptorRest {
 	}
 
 	/**
+	 * Obtiene url y puerto guardados en el registro del telefono.
+	 * 
+	 * @since 14-10-2011
+	 * @author Paul
+	 */
+	private void obtenerURL() {
+		// SharedPreferences preferencias = getSharedPreferences(
+		// Configuracion.class.getName(), MODE_WORLD_READABLE);
+		// String url = preferencias.getString(Configuracion.ANDRAC_URL, null);
+		// String puerto =
+		// preferencias.getString(Configuracion.ANDRAC_PUERTO,null);
+
+		SharedPreferences preferencias = PreferenceManager
+				.getDefaultSharedPreferences(this);
+
+		// FIXME hay que ir a buscarlos a los xml? =P
+		String url = preferencias.getString("url",
+				"www.accion-ciudadana.com.ar");
+		String puerto = preferencias.getString("puerto", "6060");
+
+		if (url == null || url.length() == 0) {
+			url = getString(R.string.url_estandar);
+		}
+		if (puerto == null || puerto.length() == 0) {
+			puerto = getString(R.string.puerto_estandar);
+		}
+		Log.d(this.getClass().getName(), "Config url: " + url);
+		Log.d(this.getClass().getName(), "Config puerto: " + puerto);
+
+		this.getRepo().setUrlServer(HTTP + url + ":" + puerto);
+	}
+
+	/**
 	 * Guarda usuario y pass en el registro del telefo.
 	 * 
 	 * @since 11-10-2011
@@ -485,5 +542,21 @@ public class Login extends Activity implements ReceptorRest {
 
 	private String getPass() {
 		return this.campoPass.getText().toString();
+	}
+
+	private String getTituloDialogo() {
+		return tituloDialogo;
+	}
+
+	private void setTituloDialogo(String tituloDialogo) {
+		this.tituloDialogo = tituloDialogo;
+	}
+
+	private String getMensageDialogo() {
+		return mensageDialogo;
+	}
+
+	private void setMensageDialogo(String mensageDialogo) {
+		this.mensageDialogo = mensageDialogo;
 	}
 }

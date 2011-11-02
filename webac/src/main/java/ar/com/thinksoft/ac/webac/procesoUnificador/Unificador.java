@@ -74,9 +74,9 @@ public class Unificador {
 
 		private boolean reclamoMayorAnio(IReclamo reclamo) throws ParseException {
 			long millisecs_per_day = 24 * 60 * 60 * 1000;
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-			Date dateReclamo;
-			dateReclamo = (Date)formatter.parse(reclamo.getFechaReclamo());
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			Date dateReclamo = new Date();
+			dateReclamo = formatter.parse(reclamo.getFechaReclamo());
 			Date hoy = new Date();
 			long diferencia = ( hoy.getTime() - dateReclamo.getTime() )/millisecs_per_day;
 			return diferencia >= 365;
@@ -84,15 +84,10 @@ public class Unificador {
 
 		private void compararReclamoConTodos(IReclamo reclamo) {
 			for(IReclamo reclamoBase: listaReclamos){
-				try {
 					if((reclamo.getFechaReclamo().compareTo(reclamoBase.getFechaReclamo()) <= 0))
 						reclamo.unificar(reclamoBase);
 					else
 						reclamoBase.unificar(reclamo);
-					
-				} catch (Exception e) {
-					LogFwk.getInstance(Unificador.class).error("No se pudo hacer el proceso unificaodr de reclamos. Detalle: " + e.getMessage());
-				}
 			}
 		}
     }

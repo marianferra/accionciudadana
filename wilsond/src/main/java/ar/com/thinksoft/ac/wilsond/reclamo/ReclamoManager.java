@@ -16,7 +16,6 @@ import ar.com.thinksoft.ac.wilsond.GeocoderChild;
 import ar.com.thinksoft.ac.wilsond.Repositorio.Repositorio;
 import ar.com.thinksoft.ac.wilsond.configuracion.ConfiguracionWilsonD;
 import ar.com.thinksoft.ac.wilsond.log.LogManager;
-import ar.com.thinksoft.ac.wilsond.mail.MailWilsonD;
 
 public class ReclamoManager {
 
@@ -81,8 +80,7 @@ public class ReclamoManager {
 	 */
 	public void guardarReclamo(IReclamo reclamo) {
 		Repositorio.getInstancia().store(reclamo);
-		MailWilsonD.getInstance().enviarMail(reclamo.getMailCiudadanoGeneradorReclamo(), 
-				"Accion Ciudadana - Activacion de reclamo", MailWilsonD.getInstance().armarTextoCambioEstados(reclamo.getEstadoDescripcion(), reclamo));
+		
 	}
 
 	/*
@@ -100,7 +98,16 @@ public class ReclamoManager {
 					.getCiudadanoGeneradorReclamo());
 			reclamo.setMailCiudadanoGeneradorReclamo(reclamoInt
 					.getMailCiudadanoGeneradorReclamo());
-			reclamo.cambiarEstado(reclamoInt.getEstadoDescripcion());
+			
+			String estado = reclamoInt.getEstadoDescripcion();
+			if(estado.equals(EnumEstadosReclamo.asociado.getEstado()) && reclamoInt.getReclamoPadreId() != null && reclamoInt.getReclamoPadreId() != ""){
+				Reclamo reclamoFiltro = new Reclamo();
+				reclamoFiltro.setId(reclamoInt.getReclamoPadreId());
+				List<IReclamo> reclamoPadre = ReclamoManager.getInstance().obtenerReclamosFiltrados(reclamoFiltro);
+				estado = reclamoPadre.get(0).getEstadoDescripcion();
+			}
+			
+			reclamo.cambiarEstado(estado);
 			reclamo.setFechaReclamo(reclamoInt.getFechaReclamo());
 			reclamo.setFechaUltimaModificacionReclamo(reclamoInt
 					.getFechaUltimaModificacionReclamo());

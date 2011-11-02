@@ -10,15 +10,27 @@ form
 
 label
 {
-   padding:2px;
-   text-align:left;
-   vertical-align: middle;
+    padding:2px;
+    text-align:left;
+    vertical-align: middle;
+	font-family: "Trebuchet MS",Geneva,Arial,Helvetica,sans-serif;
+	font-size: 15px;
+}
+
+input{
+	font-family: "Trebuchet MS",Geneva,Arial,Helvetica,sans-serif;
+	font-size: 15px;	
+}
+
+select{
+	font-family: "Trebuchet MS",Geneva,Arial,Helvetica,sans-serif;
+	font-size: 15px;	
 }
 
 .block{
    margin:10px 2px; 
    font-family: "Trebuchet MS", Geneva, Arial, Helvetica, sans-serif;
-   font-size: 12px;
+   font-size: 15px;
 }
 
 td.texto{
@@ -38,7 +50,7 @@ td.texto{
 
 .imagen{
 	width: 30em; 
-	height: 25em;	
+	height: 20em;	
 	/*float: right;*/
 }
 
@@ -48,5 +60,5 @@ td.texto{
 
 .contenedorText{
 	width: 30em; 
-	height: 25em;	
+	height: 20em;	
 }

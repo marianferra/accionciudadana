@@ -1,5 +1,6 @@
 package ar.com.thinksoft.ac.webac.reclamo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,20 +10,23 @@ import ar.com.thinksoft.ac.intac.EnumPrioridadReclamo;
 import ar.com.thinksoft.ac.intac.IImagen;
 import ar.com.thinksoft.ac.intac.IReclamo;
 import ar.com.thinksoft.ac.webac.exceptions.MailException;
+import ar.com.thinksoft.ac.webac.logging.LogFwk;
 import ar.com.thinksoft.ac.webac.mail.MailManager;
+import ar.com.thinksoft.ac.webac.web.reclamo.busquedaReclamo.BusquedaReclamoForm;
 
 /**
  * Implementacion de IReclamo en intac
  * @author Matias
  *
  */
-public class Reclamo implements IReclamo{
+public class Reclamo implements IReclamo,Serializable{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private String id;
+	private String idPadre;
 	private String calleReclamo;
 	private String alturaReclamo;
 	private String latitudReclamo;
@@ -210,7 +214,10 @@ public class Reclamo implements IReclamo{
 		return this.reclamosAsociados;
 	}
 	
-		
+	public String getReclamoPadreId() {
+		return this.idPadre;
+	}
+	
 	//SET ATRIBUTOS
 	
 	public void setId() {
@@ -280,6 +287,10 @@ public class Reclamo implements IReclamo{
 	public void setPrioridad(String prioridad) throws Exception{
 		this.prioridad = prioridad;
 		
+	}	
+	
+	public void setReclamoPadreId(String id) {
+		this.idPadre = id;
 	}
 
 	public void setComunaIncidentePorBarrio(String barrio){
@@ -342,13 +353,23 @@ public class Reclamo implements IReclamo{
 	
 	// METODOS PARA UNIFICACION
 	
-	public void unificar(IReclamo reclamo) throws Exception{
+	public void unificar(IReclamo reclamo){
 		if(this.isIgual(reclamo) && this.isNotDown() && reclamo.isNotDown()){
-			reclamo.setAsociadoReclamo();
-			this.getReclamosAsociados().add(reclamo);
-			definirPrioridadUnificado(reclamo);
-			ReclamoManager.getInstance().guardarReclamo(this);
-			ReclamoManager.getInstance().guardarReclamo(reclamo);
+			try{
+				reclamo.setAsociadoReclamo();
+				this.getReclamosAsociados().add(reclamo);
+				reclamo.setReclamoPadreId(this.getId());
+				for(IReclamo r : reclamo.getReclamosAsociados()){
+					r.setReclamoPadreId(this.getId());
+					ReclamoManager.getInstance().guardarReclamo(r);
+				}
+				
+				definirPrioridadUnificado(reclamo);
+				ReclamoManager.getInstance().guardarReclamo(this);
+				ReclamoManager.getInstance().guardarReclamo(reclamo);
+			} catch (Exception e) {
+				LogFwk.getInstance(BusquedaReclamoForm.class).error("No se pudo hacer la unificacion de reclamos. Detalle: " + e.getMessage());
+			}
 		}
 	}
 	
@@ -388,5 +409,14 @@ public class Reclamo implements IReclamo{
 				this.setPrioridad(EnumPrioridadReclamo.media.getPrioridad());
 		}
 	}
-	
+
+	/**
+	 * Esto es solo para wilsonD, cuando hago un reclamo filtro para obtener el estado del Padre.
+	 * @param reclamoPadreId
+	 */
+	public void setId(String reclamoPadreId) {
+		this.id = reclamoPadreId;
+		
+	}
+
 }

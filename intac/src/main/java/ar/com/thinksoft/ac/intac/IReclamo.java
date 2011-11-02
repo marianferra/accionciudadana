@@ -12,6 +12,8 @@ public interface IReclamo extends Serializable{
 
 	// Obtencion de atributos que deben tener los reclamos.
 	
+	public String getReclamoPadreId();
+	
 	public String getId();
 	
 	public String getCalleIncidente();
@@ -49,6 +51,8 @@ public interface IReclamo extends Serializable{
 	// Fin obtencion de atributos
 	
 	// Setear atributos
+	
+	public void setReclamoPadreId(String id);
 	
 	public  void setId();
 	
@@ -94,7 +98,7 @@ public interface IReclamo extends Serializable{
 	
 	public  boolean isIgual(IReclamo reclamo);
 	
-	public  void unificar(IReclamo reclamo) throws Exception;
+	public  void unificar(IReclamo reclamo);
 	
 	public  void cancelarReclamo() throws Exception;
 

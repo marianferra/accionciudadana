@@ -118,7 +118,7 @@
 						<tr>
 							<td>
 								<div class="block">
-									<input type="text" class="error" border="none" size="50"/>
+									<label class="error" wicket:id="errorLabel"></label>
 								</div>
 							</td>
 						</tr>
@@ -129,7 +129,7 @@
 						<tr>
 							<td>
 								<div>
-									<input type="submit" value="Registrar" onclick="validarRepeticiones()" class="block guardarRegistro"/>
+									<input type="submit" wicket:id="guardarRegistro" value="Registrar" onclick="validarRepeticiones()" class="block guardarRegistro buttonSubmit"/>
 								</div>
 							</td>
 						</tr>
