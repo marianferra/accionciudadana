@@ -25,7 +25,8 @@
 	<string name="calle">Calle</string>
 	<string name="altura">Altura</string>
 	<string name="campos_restringidos">Usuario y contraseña solo pueden contener
-		minúsculas, sin espacios.</string>
+		minúsculas, sin espacios.
+	</string>
 	<string name="campos_opcionales">Datos opcionales:</string>
 	<string name="campos_obligatorios">Datos obligatorios:</string>
 	<string name="login_exito">Autentificación Exitosa!</string>
@@ -54,11 +55,14 @@
 	<string name="reclamo_enviado">Su reclamo ha sido enviado.</string>
 	<string name="reclamo_no_enviado">En este momento no se pudo enviar su reclamo. El
 		mismo se guardará en la "Lista de Reclamos Guardados" para que lo
-		pueda enviar en otro momento.</string>
+		pueda enviar en otro momento.
+	</string>
 	<string name="reclamo_no_reenviado">En este momento no se puede enviar su reclamo.
-		Verifique la conexión a internet e intentelo nuevamente.</string>
+		Verifique la conexión a internet e intentelo nuevamente.
+	</string>
 	<string name="reclamo_no_guardado">No se ha podido guardar su reclamo. Asegurese de
-		tener permisos para guardar en la memoria.</string>
+		tener permisos para guardar en la memoria.
+	</string>
 	<string name="no_enviado">No enviado</string>
 	<string name="iniciar_reclamo">Iniciar Reclamo</string>
 	<string name="tipodeincidente_prompt">Tipo de Incidente</string>
@@ -78,12 +82,16 @@
 	<string name="procesando">Procesando...</string>
 	<string name="perfil_titulo">Perfil de Usuario</string>
 	<string name="error_conexion_servidor">Servidor no está funcionando. Intente conectarse
-		mas tarde. Disculpe las molestias.</string>
+		mas tarde. Disculpe las molestias.
+	</string>
 	<string name="error_inesperado">Esto es realmente embarazoso. No tenemos ni puta
-		idea que paso... Reinicia y manejalo.</string>
+		idea que paso... Reinicia y manejalo.
+	</string>
 	<string name="mensaje_error_conexion">No se pudo conectar al servidor. Revise su conexión
-		de Internet.</string>
+		de Internet.
+	</string>
 	<string name="config_svr">Configuración</string>
+	<string name="about_ac">Acerca de AC</string>
 	<string name="svr_url">URL del servidor:</string>
 	<string name="svr_puerto">Puerto del servidor:</string>
 	<string name="config_guardada">Configuración guardada.</string>

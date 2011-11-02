@@ -1,6 +1,8 @@
 package ar.com.thinksoft.ac.andrac.pantallas;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -163,6 +165,9 @@ public class Main extends Activity {
 		case R.id.config_svr:
 			this.mostrarVentanaConfiguracion();
 			return true;
+		case R.id.about_ac:
+			this.mostrarVentanaAcercaDeAC();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -311,5 +316,26 @@ public class Main extends Activity {
 		// this.startActivity(new Intent(this, Configuracion.class));
 		Intent intent = new Intent(this, MainPreference.class);
 		startActivity(intent);
+	}
+
+	/**
+	 * Muestra la ventana de Acerca de AC
+	 * 
+	 * @since 2-11-2011
+	 * @author Marian
+	 */
+	private void mostrarVentanaAcercaDeAC() {
+
+		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+		alertDialog.setTitle("Thinksoft somos:");
+		alertDialog
+				.setMessage("\nFerrabone, Marianela\nLiaous, Pavel\nPacín, Hernán\nParedes, Adriel\nTarrío Pagés, Matías");
+		alertDialog.setButton("Cerrar", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		alertDialog.setIcon(R.drawable.icono);
+		alertDialog.show();
 	}
 }
