@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -30,7 +31,7 @@ import com.google.gson.Gson;
 /**
  * La clase se encarga de manejar el listado de reclamos guardados por usuario.
  * 
- * @since 30-10-2011
+ * @since 02-11-2011
  * @author Paul
  */
 public class ListaReclamosGuardados extends Activity {
@@ -44,25 +45,37 @@ public class ListaReclamosGuardados extends Activity {
 	// Almacena posicion del reclamo en la lista
 	private int posicionReclamo = 0;
 
-	// Almacena nombres de reclamos para pasarlos al listener
-	private String[] nombreReclamosGuardados;
+	// Almacena reclamos para pasarlos al listener
+	private ArrayList<Reclamo> reclamosGuardados = new ArrayList<Reclamo>();
+
+	// Almacena nombres de los archivos de reclamo guardados
+	private ArrayList<String> nombresArchivos = new ArrayList<String>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.reclamos_guardados);
+
+		// Obtiene los reclamos guardados del usuario.
+		try {
+			this.obtenerReclamosGuardados();
+		} catch (FileNotFoundException e) {
+			// No existen reclamos guardados. Muestra nada.
+		} catch (IOException e) {
+			Log.e(this.getClass().getName(), "No se pudo leer reclamo");
+		}
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		// Obtiene los nombres de reclamos guardados del usuario.
-		nombreReclamosGuardados = this.fileList();
 
-		// Carga el listado con los reclamos guardados
+		Reclamo[] arrayReclamos = new Reclamo[this.reclamosGuardados.size()];
+		this.reclamosGuardados.toArray(arrayReclamos);
+
+		// Muestra el listado con los reclamos guardados
 		ListView listado = (ListView) findViewById(R.id.reclamos_list);
-		listado.setAdapter(new ReclamoGuardadoAdapter(this,
-				this.nombreReclamosGuardados));
+		listado.setAdapter(new ReclamoGuardadoAdapter(this, arrayReclamos));
 		listado.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int posicion, long id) {
@@ -74,11 +87,11 @@ public class ListaReclamosGuardados extends Activity {
 	/**
 	 * Crea la ventana de Dialogo. (Se hace de esta forma en Android 2.2)
 	 * 
-	 * @since 30-10-2011
+	 * @since 02-11-2011
 	 * @author Paul
 	 */
 	@Override
-	protected Dialog onCreateDialog(final int id) {
+	protected Dialog onCreateDialog(int id) {
 
 		if (id < 0) {
 			// Muestra mensaje de error.
@@ -97,7 +110,7 @@ public class ListaReclamosGuardados extends Activity {
 			return new AlertDialog.Builder(ListaReclamosGuardados.this)
 					.setIcon(R.drawable.alert_dialog_icon)
 					.setTitle(R.string.no_enviado)
-					.setMessage("Mensaje no puede estar vacio...")
+					.setMessage("Aca va el Resumen...")
 					.setNegativeButton(R.string.cancelar,
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
@@ -109,14 +122,14 @@ public class ListaReclamosGuardados extends Activity {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int whichButton) {
-									borrarReclamoLista(id);
+									borrarReclamoLista(getPosicionReclamo());
 								}
 							})
 					.setPositiveButton(R.string.enviar,
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int whichButton) {
-									setReclamoAEnviar();
+									setReclamoAEnviar(getPosicionReclamo());
 									ejecutarFuncion(FuncionRest.POSTRECLAMO);
 								}
 							}).create();
@@ -126,30 +139,20 @@ public class ListaReclamosGuardados extends Activity {
 	/**
 	 * Actualiza la ventana de dialogo antes de mostrarla.
 	 * 
-	 * @since 30-10-2011
+	 * @since 02-11-2011
 	 * @author Paul
 	 */
 	@Override
 	protected void onPrepareDialog(int indice, Dialog dialog) {
 
 		if (indice >= 0) {
-			try {
-				Reclamo reclamo = this.obtenerReclamoGuardado(indice);
-				if (reclamo != null) {
-					this.setReclamoGuardado(reclamo);
-					this.setPosicionReclamo(indice);
-					((AlertDialog) dialog).setMessage(this
-							.armarResumen(reclamo));
-				} else {
-					Log.e(this.getClass().getName(),
-							"Reclamo obtenido es null!");
-				}
-			} catch (FileNotFoundException ex) {
-				// TODO Auto-generated catch block
-				Log.e(this.getClass().getName(), "FileNotFoundException " + ex);
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				Log.e(this.getClass().getName(), "IOException " + ex);
+			Reclamo reclamo = this.reclamosGuardados.get(indice);
+			if (reclamo != null) {
+				this.setReclamoGuardado(reclamo);
+				this.setPosicionReclamo(indice);
+				((AlertDialog) dialog).setMessage(this.armarResumen(reclamo));
+			} else {
+				Log.e(this.getClass().getName(), "Reclamo obtenido es null!");
 			}
 		}
 	}
@@ -189,49 +192,51 @@ public class ListaReclamosGuardados extends Activity {
 	/**
 	 * Muestra una ventana de dialogo con el detalle de reclamo.
 	 * 
-	 * @since 31-10-2011
+	 * @since 14-10-2011
 	 * @author Paul
 	 */
 	private void mostrarDialogo(int indice) {
-		Log.d(this.getClass().getName(), "Se muestra indice: " + indice);
-		// if (indice >= 0) {
-		// Reclamo reclamo = null;
-		// try {
-		// reclamo = this.obtenerReclamoGuardado(indice);
-		// if (reclamo != null) {
-		// this.setReclamoGuardado(reclamo);
-		// this.setPosicionReclamo(indice);
-		// this.showDialog(indice);
-		// }
-		// } catch (FileNotFoundException ex) {
-		// // TODO Auto-generated catch block
-		// Log.e(this.getClass().getName(), "FileNotFoundException " + ex);
-		// } catch (IOException ex) {
-		// // TODO Auto-generated catch block
-		// Log.e(this.getClass().getName(), "IOException " + ex);
-		// }
-		// } else {
-		this.showDialog(indice);
-		// }
+		if (indice >= 0) {
+			Reclamo reclamo = reclamosGuardados.get(indice);
+			if (reclamo != null) {
+				this.setReclamoGuardado(reclamo);
+				this.setPosicionReclamo(indice);
+				this.showDialog(indice);
+			}
+		} else {
+			this.showDialog(indice);
+		}
 	}
 
 	/**
 	 * Borra un reclamo de la lista segun la posicion dada. Refresca la
 	 * pantalla.
 	 * 
-	 * @since 10-10-2011
+	 * @since 02-11-2011
 	 * @author Paul
 	 * @param posicion
 	 * @return
 	 */
 	private void borrarReclamoLista(int posicion) {
 
-		String[] nombresArchivos = this.fileList();
-		String nombreArchivo = nombresArchivos[posicion];
+		// Actualiza la lista de reclamos.
+		Reclamo reclamoABorrar = this.reclamosGuardados.remove(posicion);
+		String nombreArchivo = nombresArchivos.remove(posicion);
+
+		// Borra archivo de la foto si existe.
+		String nombreFoto = reclamoABorrar.getNombreImagen();
+		if (nombreFoto != null) {
+			this.deleteFile(nombreFoto);
+			Log.i(this.getClass().getSimpleName(), "Borra foto: " + nombreFoto);
+		}
+
+		// Borra archivo de reclamo.
 		this.deleteFile(nombreArchivo);
+		Log.i(this.getClass().getSimpleName(), "Borra reclamo: "
+				+ nombreArchivo);
 
+		// Recarga la vista
 		this.onStart();
-
 	}
 
 	/**
@@ -252,18 +257,26 @@ public class ListaReclamosGuardados extends Activity {
 	}
 
 	/**
-	 * Obtiene un reclamo guardado de la memoria
+	 * Obtiene los reclamos guardados de la memoria
 	 * 
-	 * @since 30-10-2011
+	 * @since 02-11-2011
 	 * @author Paul
 	 * @throws FileNotFoundException
-	 * @throws IOException
 	 */
-	private Reclamo obtenerReclamoGuardado(int indice)
-			throws FileNotFoundException, IOException {
+	private void obtenerReclamosGuardados() throws FileNotFoundException,
+			IOException {
 
-		FileInputStream stream = openFileInput(this.nombreReclamosGuardados[indice]);
-		return reclamoFromStream(stream);
+		String[] nombresArchivos = this.fileList();
+		FileInputStream stream;
+		for (int i = 0; i < nombresArchivos.length; i++) {
+			Log.i(this.getClass().getSimpleName(), "Archivo guardado: "
+					+ nombresArchivos[i]);
+			if (nombresArchivos[i].contains("rec")) {
+				stream = openFileInput(nombresArchivos[i]);
+				this.reclamosGuardados.add(reclamoFromStream(stream));
+				this.nombresArchivos.add(nombresArchivos[i]);
+			}
+		}
 	}
 
 	/**
@@ -293,16 +306,13 @@ public class ListaReclamosGuardados extends Activity {
 	/**
 	 * Guarda el reclamo a enviar en el repositorio.
 	 * 
-	 * @since 30-10-2011
+	 * @since 02-11-2011
 	 * @author Paul
+	 * @param indice
+	 *            Posicion del reclamo.
 	 */
-	private void setReclamoAEnviar() {
-		if (this.getReclamoGuardado() != null) {
-			this.getRepo().setReclamoAEnviar(this.getReclamoGuardado());
-		} else {
-			Log.e(this.getClass().getName(),
-					"No se encontro el reclamo a enviar!");
-		}
+	private void setReclamoAEnviar(int indice) {
+		this.getRepo().setReclamoAEnviar(this.reclamosGuardados.get(indice));
 	}
 
 	/**
@@ -338,7 +348,7 @@ public class ListaReclamosGuardados extends Activity {
 	}
 
 	private Reclamo getReclamoGuardado() {
-		return this.reclamoGuardado;
+		return reclamoGuardado;
 	}
 
 	private void setReclamoGuardado(Reclamo reclamoGuardado) {

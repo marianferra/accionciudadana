@@ -39,8 +39,11 @@ public class Main extends Activity {
 	private final int REGISTRAR_USUARIO = 4;
 
 	// Nombres de los items de la lista.
+	// private String[] ventanas = { "Iniciar Reclamo", "Reclamos Enviados",
+	// "Reclamos Guardados", "Perfil Usuario", "Registrar Usuario" };
+
 	private String[] ventanas = { "Iniciar Reclamo", "Reclamos Enviados",
-			"Reclamos Guardados", "Perfil Usuario", "Registrar Usuario" };
+			"Reclamos Guardados" };
 
 	/**
 	 * Se encarga de la creacion de la ventana.
@@ -58,11 +61,9 @@ public class Main extends Activity {
 		// Carga el listado con las funcionalidades.
 		ListView listado = (ListView) findViewById(R.id.list);
 
-		listado.setAdapter(new ArrayAdapter<String>(this,
-				R.layout.list_black_text, R.id.list_content, ventanas));
+		listado.setAdapter(new ArrayAdapter<String>(Main.this,
+				android.R.layout.simple_list_item_1, ventanas));
 
-		// listado.setAdapter(new ArrayAdapter<String>(Main.this,
-		// android.R.layout.simple_list_item_1, ventanas));
 		listado.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int posicion, long id) {
@@ -181,6 +182,15 @@ public class Main extends Activity {
 		case R.id.about_ac:
 			this.mostrarVentanaAcercaDeAC();
 			return true;
+		case R.id.profile:
+			this.ejecutarFuncion(FuncionRest.GETPERFIL);
+			return true;
+		case R.id.new_usr:
+			this.mostrarVentanaRegistro();
+			return true;
+		case R.id.logout:
+			this.salir();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -217,13 +227,13 @@ public class Main extends Activity {
 		case RECLAMOS_GUARDADOS:
 			this.mostrarVentanaReclamosGuardados();
 			break;
-		case PERFIL_USUARIO:
-			this.ejecutarFuncion(FuncionRest.GETPERFIL);
-			// this.iniciarServicioRest(FuncionRest.GETPERFIL);
-			break;
-		case REGISTRAR_USUARIO:
-			this.mostrarVentanaRegistro();
-			break;
+		// case PERFIL_USUARIO:
+		// this.ejecutarFuncion(FuncionRest.GETPERFIL);
+		// // this.iniciarServicioRest(FuncionRest.GETPERFIL);
+		// break;
+		// case REGISTRAR_USUARIO:
+		// this.mostrarVentanaRegistro();
+		// break;
 		default:
 			break;
 		}

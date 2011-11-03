@@ -31,6 +31,7 @@ public class Registro extends Activity {
 	private final int MAIL_NO_COINCIDE = 4;
 	private final int REGISTRO_FALLO = 5;
 
+
 	// Almacena titulo de la ventana de alerta
 	private String tituloAlerta = "";
 	// Almacena texto de la ventana de alerta

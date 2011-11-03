@@ -29,7 +29,7 @@
             android:layout_weight="1" >
         </ListView>
     </LinearLayout>
-
+    <!--
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -44,6 +44,7 @@
             android:enabled="true"
             android:onClick="salir"
             android:text="@string/salir" />
-    </LinearLayout>
+    </LinearLayout>
+    -->
 
 </LinearLayout>
