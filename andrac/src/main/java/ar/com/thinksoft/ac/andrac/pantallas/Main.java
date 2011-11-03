@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 import ar.com.thinksoft.ac.andrac.R;
@@ -56,8 +57,12 @@ public class Main extends Activity {
 		// TODO Hacer que se muestre la info de ayuda por cada item
 		// Carga el listado con las funcionalidades.
 		ListView listado = (ListView) findViewById(R.id.list);
-		listado.setAdapter(new ArrayAdapter<String>(Main.this,
-				android.R.layout.simple_list_item_1, ventanas));
+
+		listado.setAdapter(new ArrayAdapter<String>(this,
+				R.layout.list_black_text, R.id.list_content, ventanas));
+
+		// listado.setAdapter(new ArrayAdapter<String>(Main.this,
+		// android.R.layout.simple_list_item_1, ventanas));
 		listado.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int posicion, long id) {
@@ -77,6 +82,14 @@ public class Main extends Activity {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
+
+		ImageView imagen = (ImageView) findViewById(R.id.imageView1);
+
+		if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+			imagen.setVisibility(View.VISIBLE);
+		} else {
+			imagen.setVisibility(View.GONE);
+		}
 		this.getWindow().setBackgroundDrawableResource(R.drawable.wallpaper);
 	}
 
@@ -327,9 +340,9 @@ public class Main extends Activity {
 	private void mostrarVentanaAcercaDeAC() {
 
 		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-		alertDialog.setTitle("Thinksoft somos:");
+		alertDialog.setTitle("Thinksoft somos");
 		alertDialog
-				.setMessage("\nFerrabone, Marianela\nLiaous, Pavel\nPacín, Hernán\nParedes, Adriel\nTarrío Pagés, Matías");
+				.setMessage("\nFerrabone, Marianela\nLiaous, Pavel\nPacín, Hernán\nParedes, Adriel\nTarrío Pagés, Matías\n\n ^_^ **** ^_^");
 		alertDialog.setButton("Cerrar", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="color_texto">#FFF</color>
+	<color name="color_texto">#000000</color>
 	<color name="turquoise3">#00C5CD</color>
 	<color name="blue">#AA032E40</color>
 	<color name="blue1">#AA0000FF</color>

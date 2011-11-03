@@ -20,10 +20,12 @@ public class Reclamo extends ReclamoMovil {
 	// XXX Se sobreescribe atributo del padre. Habria que hacerlo bien.
 	protected Imagen fotoIncidente;
 
+	protected String nombreImagen;
+
 	public Reclamo(String calle, String altura, String latitud,
 			String longitud, String tipo, String fecha,
 			String fechaModificacion, String ciudadano, String observaciones,
-			String barrio, Imagen imagen) {
+			String barrio, String nombreFoto, Imagen imagen) {
 		this.setCalleIncidente(calle);
 		this.setAlturaIncidente(altura);
 		this.setLatitudIncidente(latitud);
@@ -35,14 +37,30 @@ public class Reclamo extends ReclamoMovil {
 		this.setObservaciones(observaciones);
 		this.setBarrioIncidente(barrio);
 		this.setComunaIncidentePorBarrio(barrio);
+		this.setNombreImagen(nombreFoto);
 		this.setImagen(imagen);
 	}
-	
-	public void setReclamoPadreId(String id){
-		
+
+	/**
+	 * @return the nombreImagen
+	 */
+	public String getNombreImagen() {
+		return nombreImagen;
 	}
-	
-	public String getReclamoPadreId(){
+
+	/**
+	 * @param nombreImagen
+	 *            the nombreImagen to set
+	 */
+	public void setNombreImagen(String nombreImagen) {
+		this.nombreImagen = nombreImagen;
+	}
+
+	public void setReclamoPadreId(String id) {
+
+	}
+
+	public String getReclamoPadreId() {
 		return "";
 	}
 
@@ -261,7 +279,7 @@ public class Reclamo extends ReclamoMovil {
 
 	public void setEstadoDescripcion(String estado) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
